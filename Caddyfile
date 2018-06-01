@@ -1,4 +1,12 @@
-http://localhost:80 {
+http://:2015 {
+    log stdout
+    errors stderr
+
+
+    proxy / localhost:5001 {
+        transparent
+    }
+
     authz "authz_model.conf" "authz_policy.csv"
-    root "/my-website.net"
+
 }

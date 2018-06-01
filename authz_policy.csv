@@ -1,7 +1,8 @@
-p, alice, /dataset1/*, GET
-p, alice, /dataset1/resource1, POST
-p, bob, /dataset2/resource1, *
-p, bob, /dataset2/resource2, GET
-p, bob, /dataset2/folder1/*, POST
-p, dataset1_admin, /dataset1/*, *
-g, cathy, dataset1_admin
+# "Everyone" can read
+p, *, /*, GET
+
+# Admins can write and read
+p, admins, /*, (GET)|(HEAD)|(DELETE)|(PUT)|(POST)|(PATCH)
+
+g, user, admins
+g, user@example.com, admins

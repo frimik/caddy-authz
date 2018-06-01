@@ -1,10 +1,13 @@
 package authz
 
 import (
+	"net/http"
+
+	"log"
+
 	"github.com/casbin/casbin"
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
-	"net/http"
 )
 
 // Authorizer is a middleware for filtering clients based on their ip or country's ISO code.
@@ -15,6 +18,7 @@ type Authorizer struct {
 
 // Init initializes the plugin
 func init() {
+	log.Printf("Vafan")
 	caddy.RegisterPlugin("authz", caddy.Plugin{
 		ServerType: "http",
 		Action:     Setup,
@@ -25,16 +29,16 @@ func init() {
 func GetConfig(c *caddy.Controller) (string, string) {
 	modelPath := ""
 	policyPath := ""
-	for c.Next() {              // skip the directive name
-		if !c.NextArg() {       // expect at least one value
-			return c.ArgErr().Error(), policyPath   // otherwise it's an error
+	for c.Next() { // skip the directive name
+		if !c.NextArg() { // expect at least one value
+			return c.ArgErr().Error(), policyPath // otherwise it's an error
 		}
-		modelPath = c.Val()        // use the value
+		modelPath = c.Val() // use the value
 
-		if !c.NextArg() {       // expect at least one value
-			return modelPath, c.ArgErr().Error()   // otherwise it's an error
+		if !c.NextArg() { // expect at least one value
+			return modelPath, c.ArgErr().Error() // otherwise it's an error
 		}
-		policyPath = c.Val()        // use the value
+		policyPath = c.Val() // use the value
 	}
 	return modelPath, policyPath
 }
@@ -71,7 +75,8 @@ func (a Authorizer) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, erro
 // GetUserName gets the user name from the request.
 // Currently, only HTTP basic authentication is supported
 func (a *Authorizer) GetUserName(r *http.Request) string {
-	username, _, _ := r.BasicAuth()
+	username := r.Header.Get("X-Forwarded-User")
+	log.Printf("[INFO] X-Forwarded-User: %s", username)
 	return username
 }
 
